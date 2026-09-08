@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 210 17% 7%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 17% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 17% 7%;
+    --primary: 210 17% 7%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 95.3%;
+    --secondary-foreground: 210 17% 7%;
+    --muted: 0 0% 95.3%;
+    --muted-foreground: 0 0% 38%;
+    --accent: 0 0% 95.3%;
+    --accent-foreground: 210 17% 7%;
+    --destructive: 0 72% 41%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 84.7%;
+    --input: 0 0% 84.7%;
+    --ring: 210 17% 7%;
+    --radius: 0.25rem;
+
+    /* Токены KRAFTPAK */
+    --kp-ink: #0D1115;
+    --kp-graphite: #262626;
+    --kp-brand: #FBEA3A;
+    --kp-fog: #F3F3F3;
+    --kp-line: #D8D8D8;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-white text-ink antialiased;
+    font-family: "Inter", "Golos Text", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-feature-settings: "ss01" on, "cv11" on;
+  }
+
+  /* Видимый focus для клавиатурной навигации */
+  :focus-visible {
+    outline: 2px solid var(--kp-ink);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--kp-brand);
+    color: var(--kp-ink);
+  }
+}
+
+@layer components {
+  .kp-container {
+    @apply mx-auto w-full max-w-[1520px] px-4 sm:px-6 lg:px-10;
+  }
+
+  .kp-h1 {
+    font-size: clamp(2rem, 4.6vw, 4.5rem);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+
+  .kp-h2 {
+    font-size: clamp(1.5rem, 2.8vw, 2.6rem);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    font-weight: 800;
+  }
+
+  .kp-btn {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors duration-200;
+  }
+  .kp-btn-primary {
+    @apply kp-btn bg-brand text-ink hover:bg-ink hover:text-brand;
+  }
+  .kp-btn-dark {
+    @apply kp-btn bg-ink text-white hover:bg-graphite;
+  }
+  .kp-btn-outline {
+    @apply kp-btn border border-ink bg-transparent text-ink hover:bg-ink hover:text-white;
+  }
+
+  .kp-card-line {
+    @apply border border-line;
+  }
+}
+
+/* Анимации 200–600мс, уважение к reduced motion */
+.kp-fade-in {
+  animation: kpFade 300ms ease-out both;
+}
+@keyframes kpFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Live-region только для скринридеров */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
