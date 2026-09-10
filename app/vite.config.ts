@@ -7,6 +7,9 @@ import { inspectAttr } from 'kimi-plugin-inspect-react'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // GitHub Pages publishes this project below /CraftPack/.
+  // Keep root paths for local and server deployments.
+  base: process.env.GITHUB_ACTIONS ? "/CraftPack/" : "/",
   plugins: [
     devServer({ entry: "api/boot.ts", exclude: [/^\/(?!api\/).*$/] }),
     inspectAttr(), react()],
