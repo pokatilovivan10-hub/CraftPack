@@ -34,7 +34,12 @@ export function formatDateRu(d: Date | string): string {
 
 export function imageUrl(storageKey: string | null | undefined): string | null {
   if (!storageKey) return null;
-  return "/" + storageKey.replace(/^\//, "");
+  const key = storageKey.replace(/^\//, "");
+  // Фото товаров отдаём через /api/uploads/*: этот путь всегда доходит до
+  // сервера, тогда как /uploads/* может перехватываться статическим слоем
+  // платформы, где файлов загрузок нет.
+  if (key.startsWith("uploads/")) return "/api/" + key;
+  return "/" + key;
 }
 
 /** srcset для изображения с дополнительными размерами (variants: {"480": "uploads/..."}). */
