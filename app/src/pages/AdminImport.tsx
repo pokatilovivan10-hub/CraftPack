@@ -4,9 +4,12 @@ import { Seo } from "@/lib/Seo";
 import { formatDateRu } from "@/lib/format";
 
 const TOKEN_KEY = "kraftpak_admin_token";
+const SITES_RUNTIME = import.meta.env.VITE_SITES_RUNTIME === "true";
 
 export default function AdminImport() {
-  const [token, setToken] = useState(() => sessionStorage.getItem(TOKEN_KEY) ?? "");
+  const [token, setToken] = useState(() =>
+    SITES_RUNTIME ? "sites-owner" : sessionStorage.getItem(TOKEN_KEY) ?? "",
+  );
   const [authed, setAuthed] = useState(false);
   const [loginError, setLoginError] = useState("");
   const login = trpc.admin.login.useMutation();
@@ -29,27 +32,40 @@ export default function AdminImport() {
         <Seo title="Администрирование" noindex />
         <form onSubmit={submitLogin} className="w-full max-w-sm border border-line p-8">
           <h1 className="text-xl font-bold">Импорт каталога</h1>
-          <p className="mt-2 text-sm text-neutral-600">
-            Раздел доступен администратору. Введите токен доступа.
-          </p>
-          <label htmlFor="adm-token" className="mt-6 block text-sm font-medium">
-            Токен
-          </label>
-          <input
-            id="adm-token"
-            type="password"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            className="mt-1 h-12 w-full border border-line px-4 focus:border-ink"
-            autoComplete="current-password"
-          />
+          {SITES_RUNTIME ? (
+            <>
+              <p className="mt-2 text-sm text-neutral-600">
+                Раздел доступен владельцу сайта после безопасного входа через ChatGPT.
+              </p>
+              <a href="/signin-with-chatgpt" className="kp-btn-outline mt-6 w-full text-center">
+                Войти через ChatGPT
+              </a>
+            </>
+          ) : (
+            <>
+              <p className="mt-2 text-sm text-neutral-600">
+                Раздел доступен администратору. Введите токен доступа.
+              </p>
+              <label htmlFor="adm-token" className="mt-6 block text-sm font-medium">
+                Токен
+              </label>
+              <input
+                id="adm-token"
+                type="password"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                className="mt-1 h-12 w-full border border-line px-4 focus:border-ink"
+                autoComplete="current-password"
+              />
+            </>
+          )}
           {loginError && (
             <p role="alert" className="mt-2 text-sm font-medium text-red-700">
               {loginError}
             </p>
           )}
           <button type="submit" className="kp-btn-dark mt-6 w-full" disabled={login.isPending}>
-            Войти
+            {SITES_RUNTIME ? "Проверить доступ" : "Войти"}
           </button>
         </form>
       </div>
