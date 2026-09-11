@@ -24,6 +24,10 @@ const KOROBKI_COVER_SKUS = ["7211201/417", "0007447", "720745/7", "721302/5"] as
 
 export default function Home() {
   const { data: categories } = trpc.catalog.categories.useQuery(undefined, { staleTime: 5 * 60_000 });
+  const { data: catalogSummary } = trpc.catalog.productsList.useQuery(
+    { page: 1, pageSize: 24, sort: "default" },
+    { staleTime: 5 * 60_000 },
+  );
   const { data: featured, isLoading } = trpc.catalog.featured.useQuery({ limit: 8 });
   const { data: heroProducts } = trpc.catalog.bySkus.useQuery(
     {
@@ -134,14 +138,14 @@ export default function Home() {
               );
             })}
             <Link
-              to="/catalog/korobki"
+              to="/catalog"
               className="group flex aspect-square flex-col justify-between bg-graphite p-4 transition-colors duration-300 hover:bg-brand hover:text-ink"
             >
               <ArrowUpRight className="h-5 w-5 self-end opacity-60 transition-transform duration-300 group-hover:rotate-45" aria-hidden />
               <span>
-                <span className="block text-2xl font-extrabold">{korobki ? korobki.productCount.toLocaleString("ru-RU") : "—"}</span>
+                <span className="block text-2xl font-extrabold">{catalogSummary ? catalogSummary.total.toLocaleString("ru-RU") : "—"}</span>
                 <span className="mt-1 block text-xs font-semibold uppercase tracking-widest opacity-70">
-                  товаров в прайсе
+                  товаров в каталоге
                 </span>
               </span>
             </Link>
