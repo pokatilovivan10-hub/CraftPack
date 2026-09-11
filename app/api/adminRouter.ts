@@ -4,7 +4,7 @@ import { desc, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { createRouter, publicQuery } from "./middleware";
 import { getDb } from "./queries/connection";
-import { importBatches, importIssues, sectionMappings, categories } from "@db/schema";
+import { importBatches, importIssues, sectionMappings, categories, requests, orders } from "@db/schema";
 import { parsePriceList } from "./import/parsePriceList";
 import { applyImport } from "./import/applyImport";
 
@@ -90,6 +90,20 @@ export const adminRouter = createRouter({
             .limit(200)
         : [];
       return { batches, latestIssues: issues };
+    }),
+
+  requests: publicQuery
+    .input(z.object({ token: z.string().min(1).max(256) }))
+    .query(async ({ input }) => {
+      checkToken(input.token);
+      return getDb().select().from(requests).orderBy(desc(requests.id)).limit(100);
+    }),
+
+  orders: publicQuery
+    .input(z.object({ token: z.string().min(1).max(256) }))
+    .query(async ({ input }) => {
+      checkToken(input.token);
+      return getDb().select().from(orders).orderBy(desc(orders.id)).limit(100);
     }),
 
   mappings: publicQuery

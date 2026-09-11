@@ -84,6 +84,8 @@ function AdminPanel({ token }: { token: string }) {
   const importMutation = trpc.admin.importCatalog.useMutation();
   const [result, setResult] = useState<Awaited<ReturnType<typeof importMutation.mutateAsync>> | null>(null);
   const batches = trpc.admin.batches.useQuery({ token }, { refetchInterval: 30_000 });
+  const requests = trpc.admin.requests.useQuery({ token }, { refetchInterval: 30_000 });
+  const orders = trpc.admin.orders.useQuery({ token }, { refetchInterval: 30_000 });
   const mappings = trpc.admin.mappings.useQuery({ token });
   const utils = trpc.useUtils();
 
@@ -120,6 +122,56 @@ function AdminPanel({ token }: { token: string }) {
         Сначала запустите предварительную проверку (dry-run) — она не меняет базу.
         Затем примените импорт. Повторная загрузка идентичного файла дублей не создаёт.
       </p>
+
+      <div className="mt-8 grid gap-8 xl:grid-cols-2">
+        <section aria-labelledby="requests-h">
+          <h2 id="requests-h" className="text-lg font-bold">Последние заявки</h2>
+          <div className="mt-3 overflow-x-auto border border-line">
+            <table className="w-full min-w-[680px] text-sm">
+              <thead className="bg-fog text-left text-xs uppercase tracking-wide">
+                <tr><th className="p-3">Номер</th><th className="p-3">Дата</th><th className="p-3">Тип</th><th className="p-3">Клиент</th><th className="p-3">Телефон</th><th className="p-3">Комментарий</th></tr>
+              </thead>
+              <tbody>
+                {requests.data?.map((item) => (
+                  <tr key={item.id} className="border-t border-line align-top">
+                    <td className="p-3 font-semibold">{item.number}</td>
+                    <td className="p-3 whitespace-nowrap">{formatDateRu(item.createdAt)}</td>
+                    <td className="p-3">{item.type}</td>
+                    <td className="p-3">{item.name}</td>
+                    <td className="p-3 whitespace-nowrap"><a className="underline" href={`tel:${item.phone}`}>{item.phone}</a></td>
+                    <td className="max-w-64 p-3">{item.comment || item.preferredTime || "—"}</td>
+                  </tr>
+                ))}
+                {requests.data?.length === 0 && <tr><td className="p-4 text-neutral-500" colSpan={6}>Заявок пока нет.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section aria-labelledby="orders-h">
+          <h2 id="orders-h" className="text-lg font-bold">Последние заказы</h2>
+          <div className="mt-3 overflow-x-auto border border-line">
+            <table className="w-full min-w-[720px] text-sm">
+              <thead className="bg-fog text-left text-xs uppercase tracking-wide">
+                <tr><th className="p-3">Номер</th><th className="p-3">Дата</th><th className="p-3">Клиент</th><th className="p-3">Контакты</th><th className="p-3">Позиций</th><th className="p-3">Сумма</th></tr>
+              </thead>
+              <tbody>
+                {orders.data?.map((item) => (
+                  <tr key={item.id} className="border-t border-line align-top">
+                    <td className="p-3 font-semibold">{item.number}</td>
+                    <td className="p-3 whitespace-nowrap">{formatDateRu(item.createdAt)}</td>
+                    <td className="p-3">{item.customerName}{item.company ? <span className="block text-xs text-neutral-500">{item.company}</span> : null}</td>
+                    <td className="p-3"><a className="underline" href={`tel:${item.phone}`}>{item.phone}</a><a className="block underline" href={`mailto:${item.email}`}>{item.email}</a></td>
+                    <td className="p-3">{item.itemsCount}</td>
+                    <td className="p-3 whitespace-nowrap">{item.total} ₽</td>
+                  </tr>
+                ))}
+                {orders.data?.length === 0 && <tr><td className="p-4 text-neutral-500" colSpan={6}>Заказов пока нет.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-2">
         <section className="border border-line p-6" aria-labelledby="imp-h">

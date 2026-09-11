@@ -23,6 +23,7 @@ export function CallbackModal({ onClose }: Props) {
   const [honeypot, setHoneypot] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "error" | "failed" | "success">("idle");
   const [error, setError] = useState("");
+  const [requestNumber, setRequestNumber] = useState("");
   const createRequest = trpc.request.create.useMutation();
 
   // Focus trap + Escape + блокировка прокрутки + возврат фокуса
@@ -78,7 +79,7 @@ export function CallbackModal({ onClose }: Props) {
     }
     setState("sending");
     try {
-      await createRequest.mutateAsync({
+      const result = await createRequest.mutateAsync({
         type: "callback",
         name: name.trim(),
         phone: phone.trim(),
@@ -88,6 +89,8 @@ export function CallbackModal({ onClose }: Props) {
         honeypot: honeypot || undefined,
       });
       track({ name: "consultation_submit", form: "callback" });
+      setRequestNumber(result.number);
+      try { localStorage.removeItem("kraftpak_callback_draft"); } catch { /* noop */ }
       setState("success");
     } catch (err) {
       try {
@@ -133,7 +136,7 @@ export function CallbackModal({ onClose }: Props) {
 
         {state === "success" ? (
           <div role="status" className="mt-6">
-            <p className="font-bold">Заявка принята</p>
+            <p className="font-bold">Заявка {requestNumber} принята</p>
             <p className="mt-2 text-sm text-neutral-600">
               Перезвоним в рабочее время ({site.workHours}).
             </p>
